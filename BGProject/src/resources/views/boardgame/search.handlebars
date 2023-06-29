@@ -1,0 +1,116 @@
+<div class="boardgames isSelected">
+    <a href="/" class="home">
+        <h4 class="text-home"> <i class="fa-solid fa-backward home-icon"></i> Back to home</h1>
+    </a>
+ <div class="grid ">
+            {{#if ThongtinBGs}}
+                {{#each ThongtinBGs}}
+                    <div class="grid__col-4">
+                        <div class="boardgame">
+                            <img src="{{this.HinhAnh}}" alt="" class="boardgame-img">
+                            <div class="boardgame-info">
+                                <div class="boardgame-info__item">
+                                    <a class="boardgame-link__name" href="/home/{{this.TenBoardGame}}">{{this.TenBoardGame}}</a>
+                                </div>
+                                <div class="boardgame-info__item">
+                                    <a class="boardgame-link__price" href="/home/{{this.TenBoardGame}}">Giá: {{this.GiaThue}} VND</a>
+                                </div>
+                             
+                                {{#if SoLuong }}
+                                    <p class="boardgame-info__status">Tình trạng: <span class="available">Còn hàng</span></p>
+                                    <button class="boardgame-btn modal-buy" data-bgId="{{this._id}}"> Giữ chỗ</button>
+                                {{else}}
+                                    <p class="boardgame-info__status">Tình trạng: <span class="sold-out">Hết hàng</span></p>
+                                {{/if}}
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            {{else}}
+                <p class="no-results">Không tìm thấy kết quả phù hợp.</p>
+            {{/if}}
+        </div>
+</div>
+{{!-- modal input --}}
+    <div class="modal-add">
+        <div class="modal-container-add">
+            <div class="header-modal-add">
+                 Thông tin giữ hàng 
+                <div class="icon-close-add closeModal"><i class="fa-regular fa-circle-xmark"></i></div>
+            </div>
+           <form action="/phone" method="POST" id="modalForm">
+                <div class="body-modal-add">
+                    <p class="body-add-heading">
+                        Phiếu giữ hàng
+                    </p>
+                    <p id="bgIdValue" style="display: none;"  ></p>
+
+                    <input type="text" class="phone" name="phone" placeholder="Nhập số điện thoại" value="" required="true">
+                    <input type="hidden" name="bgId" id="bgIdInput" value="">
+                </div>
+                <button class="footer-modal-add button" id="modalSubmitBtn">
+                      Giữ hàng
+                </button>
+            </form>
+        </div>
+    </div>
+     <div class="successmessage" id="successMessage" style="display: none;">
+        <div class="modal-container-add">
+           <div class="header-modal-add success">
+                Giữ hàng thành công
+            </div>   
+           <div class="modal-container-content">
+              <p class="modal-container-item welcome" > Board Game Store xin chân thành cảm ơn! </p>
+              <p class="modal-container-item" id="expiration-message"></p>
+              <p class="modal-container-item">  Địa chỉ cửa hàng : Linh Trung, Thủ Đức </p>
+              <p class="modal-container-item warnning">  Lưu ý: Việc giữ hàng cho quý khách sẽ bị <span class="cancle">HỦY</span> sau thời gian hiệu lực</p>
+           </div>
+        </div> 
+    </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const $$ = document.querySelectorAll.bind(document)
+    const $ = document.querySelector.bind(document);
+        const openModal = $('.modal-add');
+        const closeModal = $('.closeModal');
+        const btnModals = $$('.modal-buy');
+        const successMessage = $('.successmessage');
+        const openNotiSuccess = $('.footer-modal-add');
+        const modalForm = document.getElementById('modalForm');
+        const modalSubmitBtn = document.getElementById('modalSubmitBtn');
+        const expirationMessage = document.getElementById('expiration-message');
+
+   
+            btnModals.forEach((btnModal,index) => {
+                btnModal.addEventListener('click', function() {
+                    // Khi click xảy ra, lấy giá trị bgID từ thuộc tính data-bgId của button 
+                    const bgId = btnModal.getAttribute('data-bgId');
+                    // Cập nhật giá trị của thẻ <p> bgIdValue
+                    bgIdValue.textContent = `MaTTBG: ${bgId}`;
+                    const bgIdInput = document.getElementById('bgIdInput');
+                    bgIdInput.value = bgId;
+
+                    openModal.classList.add('open');
+    
+                    modalSubmitBtn.addEventListener('click', function (event) {
+                        // Tắt form giữ hàng
+                        openModal.classList.remove('open');
+                        successMessage.style.display = 'flex';
+                        var expirationDate = new Date();
+                        expirationDate.setHours(expirationDate.getHours() + 24);
+
+                        expirationMessage.innerHTML = 'Thời gian giữ hàng đến: ' + expirationDate.toLocaleString();
+                        // Đặt thời gian chờ 5 giây trước khi tắt thông báo thành công và chuyển hướng
+                        setTimeout(function () {
+                            successMessage.style.display = 'none';
+                            window.location.href = '/'
+                        }, 5000);
+                    })
+
+                    closeModal.addEventListener('click', function() {
+                   openModal.classList.remove('open');
+                })
+                });
+            })
+    })
+</script>
